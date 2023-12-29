@@ -19,17 +19,17 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.comunidadedevspace.taskbeats.data.local.AppDataBase
 import com.example.contactlist.Data.Contact
 import com.example.contactlist.Data.ContactDao
 import com.example.contactlist.R
+import com.example.contactlist.ViewModel.ContactViewModel
 import com.example.contactlist.ui.theme.White
 import com.example.contactlist.ui.theme.shapesCardView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
-private lateinit var DAO : ContactDao
 
 
 @Composable
@@ -38,20 +38,18 @@ fun itemList(
     navController: NavController,
     position: Int,
     ContactList: MutableList<Contact>,
-    context: Context
+    context: Context,
+    viewModel: ContactViewModel = hiltViewModel()
 
 ) {
 
-    val scope=rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     val namev = ContactList[position].name
     val surnamev = ContactList[position].surname
     val yearsv = ContactList[position].years
     val phonev = ContactList[position].phone
     val id = ContactList[position].id
-
-
-    val contact = ContactList[position]
 
 
     fun AlertDaialogDeleteContact() {
@@ -61,20 +59,16 @@ fun itemList(
             .setMessage("Tem Certeza?")
         alertDialog.setPositiveButton("Ok") { _, _ ->
 
-            scope.launch(Dispatchers.IO) {
 
-                DAO =AppDataBase.getAppDataBaseInstance(context).contactDao()
-                DAO.deleteById(id)
-                ContactList.remove(contact)
-            }
-            scope.launch(Dispatchers.Main) {
-
-                navController.navigate("ContactList")
-
-                Toast.makeText(context,"COntato Removido com Sucesso!", Toast.LENGTH_SHORT).show()
+            viewModel.deletecontact(id)
 
 
-            }
+
+
+            navController.navigate("ContactList")
+
+            Toast.makeText(context, "COntato Removido com Sucesso!", Toast.LENGTH_SHORT).show()
+
 
         }
         alertDialog.setNegativeButton("Cancelar") { _, _ -> }
@@ -179,7 +173,7 @@ fun itemList(
                 onClick = {
 
 
-                          AlertDaialogDeleteContact()
+                    AlertDaialogDeleteContact()
                 },
 
 

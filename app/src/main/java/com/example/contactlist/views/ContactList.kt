@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -24,42 +25,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.comunidadedevspace.taskbeats.data.local.AppDataBase
 import com.example.contactlist.Data.Contact
 import com.example.contactlist.Data.ContactDao
 import com.example.contactlist.R
+import com.example.contactlist.ViewModel.ContactViewModel
 import com.example.contactlist.ui.theme.Purple500
 import com.example.contactlist.ui.theme.White
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-private lateinit var DAO: ContactDao
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactList(navController: NavController) {
+fun ContactList(navController: NavController, viewModel: ContactViewModel = hiltViewModel()) {
 
-    val ContactList: MutableList<Contact> = mutableListOf()
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    scope.launch(Dispatchers.IO) {
-
-
-        DAO = AppDataBase.getAppDataBaseInstance(context).contactDao()
-         val contacts = DAO.getAll()
-
-        for(contact in contacts){
-            
-          ContactList.add(contact)
-            
-            
-            
-        }
-
-    }
+    val contacList = viewModel.getCOntacts().collectAsState(mutableListOf()).value
 
 
     Scaffold(
@@ -115,22 +103,19 @@ fun ContactList(navController: NavController) {
 
         ) {
 
-            LazyColumn(){
-
+            LazyColumn() {
 
 
                 // Os itens esperam uma lambda com o item e com o position
-                itemsIndexed(ContactList){position, item ->
+                itemsIndexed(contacList) { position, item ->
 
-                 itemList(navController,position,ContactList,context)
+                    itemList(navController, position, contacList, context, viewModel)
 
 
                 }
 
 
-
             }
-
 
 
         }
@@ -143,6 +128,6 @@ fun ContactList(navController: NavController) {
 @Preview
 fun ContactListPreview() {
 
-    ContactList(navController = rememberNavController())
+    ContactList(navController = rememberNavController(), viewModel = hiltViewModel())
 
 }

@@ -27,12 +27,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.comunidadedevspace.taskbeats.data.local.AppDataBase
 import com.example.contactlist.Components.ButtonCustom
 import com.example.contactlist.Components.OutlinedTextFielCustom
 import com.example.contactlist.Data.Contact
 import com.example.contactlist.Data.ContactDao
+import com.example.contactlist.ViewModel.ContactViewModel
 import com.example.contactlist.ui.theme.Purple500
 import com.example.contactlist.ui.theme.White
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +43,7 @@ private lateinit var DAO: ContactDao
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UpdatesContacts(navController: NavController, id: String) {
+fun UpdatesContacts(navController: NavController, id: String, viewModel: ContactViewModel = hiltViewModel()) {
 
     val scope = rememberCoroutineScope()
     val ContacList: MutableList<Contact> = mutableListOf()
@@ -192,13 +193,10 @@ fun UpdatesContacts(navController: NavController, id: String) {
                     } else {
 
                         mensage = true
-                        scope.launch(Dispatchers.IO) {
-                            val contact = Contact(name, surname, years, telephone)
-                            ContacList.add(contact)
-                            DAO = AppDataBase.getAppDataBaseInstance(context).contactDao()
-                            DAO.update(id, name, surname, years, telephone)
 
-                        }
+
+                         viewModel.updatecontact(id,name,surname,years,telephone)
+
 
                         scope.launch(Dispatchers.Main) {
 

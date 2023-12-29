@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -25,8 +26,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -50,7 +50,7 @@ android {
     }
 
 
-    kapt{
+    kapt {
 
         javacOptions {
             // Definir a versão do Java para kapt
@@ -59,10 +59,7 @@ android {
         }
 
 
-
     }
-
-
 
 
 }
@@ -86,8 +83,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation ("androidx.compose.material:material:1.5.4")
-
+    implementation("androidx.compose.material:material:1.5.4")
 
 
 //Room DataBase
@@ -99,15 +95,17 @@ dependencies {
 
     //Navagation
     val nav_version = "2.5.3"
-    implementation ("androidx.navigation:navigation-compose:$nav_version")
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 
 
 //Contraint Layout
-    implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    //Hilt
 
+    implementation("com.google.dagger:hilt-android:2.48")
 
+    kapt("com.google.dagger:hilt-compiler:2.44")
 
-
-
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
 }

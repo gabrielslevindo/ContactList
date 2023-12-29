@@ -28,24 +28,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.comunidadedevspace.taskbeats.data.local.AppDataBase
 import com.example.contactlist.Components.ButtonCustom
 import com.example.contactlist.Components.OutlinedTextFielCustom
 import com.example.contactlist.Data.Contact
-import com.example.contactlist.Data.ContactDao
+import com.example.contactlist.ViewModel.ContactViewModel
 import com.example.contactlist.ui.theme.Purple500
 import com.example.contactlist.ui.theme.White
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-private lateinit var DAO: ContactDao
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SaveContacts(navController: NavController) {
+fun SaveContacts(navController: NavController, viewModel: ContactViewModel = hiltViewModel()) {
 
     val ContactList: MutableList<Contact> = mutableListOf()
     val scope = rememberCoroutineScope()
@@ -104,28 +102,26 @@ fun SaveContacts(navController: NavController) {
 
             OutlinedTextFielCustom(
 
-                value = name,
-                onValueChange = {
+                value = name, onValueChange = {
 
-                name = it
+                    name = it
 
-            }, label = {
+                }, label = {
 
-                Text(text = "Nome", color = Color.Gray)
-
-
-            }, keyboardOptions = KeyboardOptions(
-
-                keyboardType = KeyboardType.Text
+                    Text(text = "Nome", color = Color.Gray)
 
 
-            ), modifier = Modifier
-                .padding(20.dp, 80.dp, 20.dp, 10.dp)
-                .fillMaxWidth()
+                }, keyboardOptions = KeyboardOptions(
+
+                    keyboardType = KeyboardType.Text
+
+
+                ), modifier = Modifier
+                    .padding(20.dp, 80.dp, 20.dp, 10.dp)
+                    .fillMaxWidth()
             )
 
-            OutlinedTextFielCustom(
-                value = surname,
+            OutlinedTextFielCustom(value = surname,
                 onValueChange = {
 
                     surname = it
@@ -143,8 +139,7 @@ fun SaveContacts(navController: NavController) {
                     .fillMaxWidth()
             )
 
-            OutlinedTextFielCustom(
-                value = years,
+            OutlinedTextFielCustom(value = years,
                 onValueChange = {
 
                     years = it
@@ -162,8 +157,7 @@ fun SaveContacts(navController: NavController) {
                     .fillMaxWidth()
             )
 
-            OutlinedTextFielCustom(
-                value = telephone,
+            OutlinedTextFielCustom(value = telephone,
                 onValueChange = {
 
                     telephone = it
@@ -184,7 +178,7 @@ fun SaveContacts(navController: NavController) {
             ButtonCustom(
                 onClick = {
 
-                    var mensage : Boolean = false
+                    var mensage: Boolean = false
 
 
 
@@ -196,36 +190,32 @@ fun SaveContacts(navController: NavController) {
                     } else {
 
                         mensage = true
-                        scope.launch(Dispatchers.IO) {
-                            val contact = Contact(name, surname, years, telephone)
-                            ContactList.add(contact)
-                            DAO = AppDataBase.getAppDataBaseInstance(context).contactDao()
-                            DAO.insertAll(ContactList)
+
+                        val contact = Contact(name,surname,years,telephone)
+                        ContactList.add(contact)
+                        viewModel.SaveContact(ContactList)
+
+
+                            if (mensage) {
+
+                                Toast.makeText(
+                                    context, "Contato Salvo com Sucesso.", Toast.LENGTH_SHORT
+                                ).show()
+                                navController.navigate("ContactList")
+
+                            } else {
+
+                                Toast.makeText(
+                                    context, "Preecha todos os Campos.", Toast.LENGTH_SHORT
+                                ).show()
+
+
+                            }
 
 
                         }
 
 
-                        scope.launch(Dispatchers.Main){
-
-                        if (mensage){
-
-                            Toast.makeText(context,"Contato Salvo com Sucesso.", Toast.LENGTH_SHORT).show()
-                            navController.navigate("ContactList")
-
-                        }else{
-
-                            Toast.makeText(context,"Preecha todos os Campos.", Toast.LENGTH_SHORT).show()
-
-
-                        }
-
-
-
-
-                        }
-
-                    }
 
 
                 },
@@ -245,6 +235,6 @@ fun SaveContacts(navController: NavController) {
 @Preview
 fun SaveContactsPreview() {
 
-    SaveContacts(navController = rememberNavController())
+    SaveContacts(navController = rememberNavController(), viewModel = hiltViewModel())
 
 }
